@@ -48,92 +48,62 @@ CiudadesProductosVentas.Model.belongsTo(Ventas.Model, { foreignKey: 'idVenta' })
 
 // Obtener una lista con la razón social de todos los proveedores en la provincia de Santa Fe
 
-// Proveedores.Model.findAll({
-//   attributes: ['RazonSocial'],
-//   include: {
-//     model: Ciudades.Model,
-//     attributes: [],
-//     required: true,
-//     include: [{ model: Provincias.Model, attributes: [], where: { Name: 'Santa Fe' } }],
-//   },
-// }).then((data) => {
-//   data.forEach((item) => {
-//     console.log(item.toJSON())
-//   })
-// }).catch((err) => {
-//   console.log(err);
-// });
+Proveedores.Model.findAll({
+  attributes: ['RazonSocial'],
+  include: {
+    model: Ciudades.Model,
+    attributes: [],
+    required: true,
+    include: [{ model: Provincias.Model, attributes: [], where: { Name: 'Santa Fe' } }],
+  },
+}).then((data) => {
+  data.forEach((item) => {
+    console.log(item.toJSON())
+  })
+}).catch((err) => {
+  console.log(err);
+});
 
 // Obtener la cantidad de sucursales que hay en la ciudad de Rosario
 
-// Sucursales.Model.count({
-//   include:{
-//     model: Ciudades.Model,
-//     required: true,
-//     where: { Name: 'Rosario' },
-//   }
-// }).then((data) => {
-//     console.log(data)
-// }).catch((err) => {
-//   console.log(err);
-// });
+Sucursales.Model.count({
+  include:{
+    model: Ciudades.Model,
+    required: true,
+    where: { Name: 'Rosario' },
+  }
+}).then((data) => {
+    console.log(data)
+}).catch((err) => {
+  console.log(err);
+});
 
 // Consultar la cantidad de ventas que se abonaron con tarjeta de crédito el último mes
 
-// Ventas.Model.count({
-//   include:{
-//     model: MetodosPagoVenta.Model,
-//     required: true,
-//     include: [{
-//       model: MetodosPago.Model,
-//       where: { Metodo: 'Credito' },
-//     }]
-//   },
-//   where: { timeStamp: { [Op.between] : ['2022-12-01' , '2023-01-01' ] } }
-// }).then((data) => {
-//   console.log(data)
-// }).catch((err) => {
-//   console.log(err);
-// });
+Ventas.Model.count({
+  include:{
+    model: MetodosPagoVenta.Model,
+    required: true,
+    include: [{
+      model: MetodosPago.Model,
+      where: { Metodo: 'Credito' },
+    }]
+  },
+  where: { timeStamp: { [Op.between] : ['2022-12-01' , '2023-01-01' ] } }
+}).then((data) => {
+  console.log(data)
+}).catch((err) => {
+  console.log(err);
+});
 
 // Consultar cuál fue el producto más vendido el último mes
 
-// Ventas.Model.findOne({
-//   attributes: [
-//     [Sequelize.fn('sum', Sequelize.col('CiudadesProductosVentas.Cantidad')), 'Total'],
-//   ],
-//   raw: true,
-//   subQuery: false,
-//   include: {
-//     model: CiudadesProductosVentas.Model,
-//     attributes: [],
-//     required: true,
-//     include: [
-//       {
-//         model: CiudadesProductos.Model,
-//         attributes: [],
-//         required: true,
-//         include: [{ model: Productos.Model, required: true, attributes: ['Nombre'] }],
-//       },
-//     ],
-//   },
-//   group: 'CiudadesProductosVentas.CiudadesProducto.Producto.id',
-//   order: [['Total', 'DESC']],
-//   where: { timeStamp: { [Op.between] : ['2022-12-01' , '2023-01-01' ] }  },
-// }).then((data) => {
-//     console.log(data)
-//   }).catch((err) => {
-//     console.log(err);
-//   });
-
-
-// Consultar los ingresos totales del último mes
-
-Ventas.Model.findAll({
+Ventas.Model.findOne({
   attributes: [
-    [Sequelize.fn('sum', (Sequelize.col('CiudadesProductosVentas.Cantidad') * Sequelize.col('CiudadesProductos.Precio'))), 'Total'],
+    [Sequelize.fn('sum', Sequelize.col('CiudadesProductosVentas.Cantidad')), 'Total'],
   ],
   raw: true,
+  subQuery: false,
   include: {
     model: CiudadesProductosVentas.Model,
     attributes: [],
@@ -143,10 +113,12 @@ Ventas.Model.findAll({
         model: CiudadesProductos.Model,
         attributes: [],
         required: true,
-        include: [{ model: Productos.Model, required: true, attributes: [] }],
+        include: [{ model: Productos.Model, required: true, attributes: ['Nombre'] }],
       },
     ],
   },
+  group: 'CiudadesProductosVentas.CiudadesProducto.Producto.id',
+  order: [['Total', 'DESC']],
   where: { timeStamp: { [Op.between] : ['2022-12-01' , '2023-01-01' ] }  },
 }).then((data) => {
     console.log(data)
